@@ -32,6 +32,15 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+  
+    <dependency>
+      <groupId>org.jnbt</groupId>
+      <artifactId>JNBT</artifactId>
+      <version>1.5</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/JNBT_1.5.jar</systemPath>
+    </dependency>
+
   </dependencies>
 
   <build>
