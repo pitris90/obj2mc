@@ -25,8 +25,8 @@ import org.jnbt.Tag;
 import de.javagl.obj.*;
 
 /**
- * Hello world!
- *
+ * Based on
+ * https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/code/tribox2.txt
  */
 public class Schematic 
 {
@@ -149,6 +149,32 @@ public class Schematic
 
     private static boolean triBoxOverlap(float[] boxcenter, float[] boxhalfsize, float[][] triverts) {
 
+        /*
+         * Copyright 2020 Tomas Akenine-Möller
+         * 
+         * Permission is hereby granted, free of charge, to any person obtaining a copy
+         * of this software and associated
+         * documentation files (the "Software"), to deal in the Software without
+         * restriction, including without limitation
+         * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+         * and/or sell copies of the Software, and
+         * to permit persons to whom the Software is furnished to do so, subject to the
+         * following conditions:
+         * 
+         * The above copyright notice and this permission notice shall be included in
+         * all copies or substantial
+         * portions of the Software.
+         * 
+         * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+         * IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+         * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+         * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+         * OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+         * WHETHER IN AN ACTION OF CONTRACT, TORT
+         * OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+         * USE OR OTHER DEALINGS IN THE SOFTWARE.
+         * 
+         */
         /* use separating axis theorem to test overlap between triangle and box */
         /* need to test for overlap in these directions: */
         /* 1) the {x,y,z}-directions (actually, since we use the AABB of the triangle */
