@@ -45,6 +45,16 @@ public class Schematic
         this.height = height;
     }
 
+    private int calculateIndex(short X, short Y, short Z)
+    {
+        return  ( Y * this.length + Z) * this.width + X;
+    }
+
+    public void addBlock()
+    {
+        this.blocks[0] = 1;
+    }
+
     public static void main(String[] args) throws FileNotFoundException 
     {
         System.out.println("Hello World!");
@@ -78,6 +88,7 @@ public class Schematic
         short length = 90;
         short height = 100;
         Schematic s = new Schematic(width, length, height);
+        s.addBlock();
         File test = new File("C:/Users/petrb/Documents/obj2mc/test.schematic");
         s.save(test);
     }
