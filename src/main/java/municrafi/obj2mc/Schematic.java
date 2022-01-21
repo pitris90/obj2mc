@@ -28,31 +28,210 @@ import de.javagl.obj.*;
  * Based on
  * https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/code/tribox2.txt
  */
+
 public class Schematic 
 {
     private byte[] blocks;
     private byte[] data;
-    private short width;
-    private short length;
-    private short height;
+    private short width; // X
+    private short length; // Z
+    private short height; // Y
+    private int[] objFaceVertexIndices;
+    private float[] objVertices;
 
-    public Schematic(short width, short length, short height) 
+    public Schematic(Obj objData) 
     {
-        this.blocks = new byte[width * length * height];
-        this.data = new byte[width * length * height];
-        this.width = width;
-        this.length = length;
-        this.height = height;
+
+        objFaceVertexIndices = ObjData.getFaceVertexIndicesArray(objData, 3);
+        objVertices = ObjData.getVerticesArray(objData);
+
+        float min = 0;
+        // X axis
+        for (int i = 0; i < objVertices.length; i+=3)
+        {
+            if (objVertices[i] < min)
+                min = objVertices[i]; 
+        }
+        for (int i = 0; i < objVertices.length; i+= 3)
+        {
+            objVertices[i] += min;
+        }
+        min = 0;
+
+        // Y axis
+        for (int i = 1; i < objVertices.length; i+=3)
+        {
+            if (objVertices[i] < min)
+                min = objVertices[i]; 
+        }
+        for (int i = 1; i < objVertices.length; i+= 3)
+        {
+            objVertices[i] += min;
+        }
+        min = 0;
+
+        // Z axis
+        for (int i = 2; i < objVertices.length; i+=3)
+        {
+            if (objVertices[i] < min)
+                min = objVertices[i]; 
+        }
+        for (int i = 2; i < objVertices.length; i+= 3)
+        {
+            objVertices[i] += min;
+        }
+
+        // width initialization
+        float max = 0;
+        for (int i = 0; i < objVertices.length; i += 3)
+        {
+            if (objVertices[i] > max)
+                max = objVertices[i];
+        }
+        width = (short) Math.ceil(max);
+        max = 0;
+
+        // height initialization
+        for (int i = 1; i < objVertices.length; i += 3)
+        {
+            if (objVertices[i] > max)
+                max = objVertices[i];
+        }
+        height = (short) Math.ceil(max);
+        max = 0;
+
+        // length initialization
+        for (int i = 2; i < objVertices.length; i += 3)
+        {
+            if (objVertices[i] > max)
+                max = objVertices[i];
+        }
+        length = (short) Math.ceil(max);
+
+        blocks = new byte[width * length * height];
+        data = new byte[width * length * height];
+    }
+
+    private static float max3(float x1, float x2, float x3)
+    {
+        // returns max of 3 given floats
+        return Math.max(x1, Math.max(x2, x3));
+    }
+
+    private static float min3(float x1, float x2, float x3)
+    {
+        // returns min of 3 given floats
+        return Math.min(x1, Math.min(x2, x3));
+    }
+
+    private static float[][] boundingBox(float[] coord1, float[] coord2, float[] coord3)
+    {
+        float[] min = new float[] { 
+            (float) Math.floor(min3(coord1[0], coord2[0], coord3[0])),
+            (float) Math.floor(min3(coord1[1], coord2[1], coord3[1])),
+            (float) Math.floor(min3(coord1[2], coord2[2], coord3[2]))
+            };
+        float[] max = new float[] { 
+            (float) Math.ceil(max3(coord1[0], coord2[0], coord3[0])),
+            (float) Math.ceil(max3(coord1[1], coord2[1], coord3[1])),
+            (float) Math.ceil(max3(coord1[2], coord2[2], coord3[2]))
+            };
+        float[][] box = new float[][] {
+            min, max
+        };
+        return box;
+    }
+
+    private static float[] boundingBoxCenter (float[][] boundingBox)
+    {
+        float[] center = new float[] {
+            (boundingBox[0][0] + boundingBox[1][0]) / 2,
+            (boundingBox[0][1] + boundingBox[1][1]) / 2,
+            (boundingBox[0][2] + boundingBox[1][2]) / 2
+        }; 
+        return center;
+    }
+
+    private static float[] boundingBoxHalfSize (float[][] boundingBox)
+    {
+        float[] halfSize = new float[] {
+            Math.abs(boundingBox[0][0] - boundingBox[1][0]) / 2,
+            Math.abs(boundingBox[0][1] - boundingBox[1][1]) / 2,
+            Math.abs(boundingBox[0][2] - boundingBox[1][2]) / 2
+        }; 
+        return halfSize;
     }
 
     private int calculateIndex(short X, short Y, short Z)
     {
+        // calculates index of coordinate <X, Y, Z> in .schematic block list
         return  ( Y * this.length + Z) * this.width + X;
     }
 
     public void addBlock()
     {
+        // test method
         this.blocks[0] = 1;
+    }
+
+    public void convertObj2Schematic()
+    {
+        float[] vertex1 = new float[3];
+        float[] vertex2 = new float[3];
+        float[] vertex3 = new float[3];
+        int index1 = 0;
+        int index2 = 0;
+        int index3 = 0;
+        for (int i = 0; i < objFaceVertexIndices.length; i+=3)
+        {
+            index1 = objFaceVertexIndices[i];
+            index2 = objFaceVertexIndices[i + 1];
+            index3 = objFaceVertexIndices[i + 2];
+
+            vertex1[0] = objVertices[index1 * 3];
+            vertex1[1] = objVertices[index1 * 3 + 1];
+            vertex1[2] = objVertices[index1 * 3 + 2];
+
+            vertex2[0] = objVertices[index2 * 3];
+            vertex2[1] = objVertices[index2 * 3 + 1];
+            vertex2[2] = objVertices[index2 * 3 + 2];
+
+            vertex3[0] = objVertices[index3 * 3];
+            vertex3[1] = objVertices[index3 * 3 + 1];
+            vertex3[2] = objVertices[index3 * 3 + 2];
+
+            float[][] triverts = new float[][] {
+                vertex1,
+                vertex2,
+                vertex3
+            };
+            voxelizeBox(boundingBox(vertex1, vertex2, vertex3), triverts);
+        }
+    }
+
+    private void voxelizeBox(float[][] boundingBox, float[][] triverts)
+    {
+        float[] voxelSize = new float[] {
+            0.5f,
+            0.5f,
+            0.5f
+        };
+        for (short x = (short) boundingBox[0][0]; x < (short) boundingBox[1][0]; ++x)
+        {
+            for (short y = (short) boundingBox[0][1]; y < (short) boundingBox[1][1]; ++y)
+            {
+                for (short z = (short) boundingBox[0][2]; z < (short) boundingBox[1][2]; ++z)
+                {
+                    float[] voxelCenter = new float[] {
+                        x + 0.5f,
+                        y + 0.5f,
+                        z + 0.5f
+                    };
+                    if (triBoxOverlap(voxelCenter, voxelSize, triverts))
+                        blocks[calculateIndex(x, y, z)] = 1;
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws FileNotFoundException 
@@ -62,32 +241,33 @@ public class Schematic
         // TODO: Path jako argument
         try (InputStream blockFile = new FileInputStream("C:/Users/petrb/Documents/obj2mc/block.obj")) 
         {
-            block = ObjUtils.convertToRenderable(ObjReader.read(blockFile));
+            block = ObjReader.read(blockFile);
         } 
         catch (Exception e) 
         {
             e.printStackTrace();
         }
-        IntBuffer indices = null;
-        FloatBuffer vertices = null;
+        Obj triangulated = ObjUtils.triangulate(block);
+        int[] indices = null;
+        float[] vertices = null;
         if (block != null) 
         {
             System.out.println(block.getNumFaces());
             System.out.println(block.getNumVertices());
-            indices = ObjData.getFaceVertexIndices(block);
-            vertices = ObjData.getVertices(block);
+            indices = ObjData.getFaceVertexIndicesArray(block);
+            vertices = ObjData.getVerticesArray(block);
         }
-        int a = indices.get(0);
-        int b = indices.get(1);
-        int c = indices.get(2);
-        float x = vertices.get(a);
-        float y = vertices.get(b);
-        float z = vertices.get(c);
+        int a = indices[0];
+        int b = indices[0];
+        int c = indices[0];
+        float x = vertices[a];
+        float y = vertices[b];
+        float z = vertices[c];
         int stop = 0;
         short width = 80;
         short length = 90;
         short height = 100;
-        Schematic s = new Schematic(width, length, height);
+        Schematic s = new Schematic(triangulated);
         s.addBlock();
         File test = new File("C:/Users/petrb/Documents/obj2mc/test.schematic");
         s.save(test);
