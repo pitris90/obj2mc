@@ -54,7 +54,7 @@ public class Schematic
         }
         for (int i = 0; i < objVertices.length; i+= 3)
         {
-            objVertices[i] += min;
+            objVertices[i] += Math.abs(min);
         }
         min = 0;
 
@@ -66,7 +66,7 @@ public class Schematic
         }
         for (int i = 1; i < objVertices.length; i+= 3)
         {
-            objVertices[i] += min;
+            objVertices[i] += Math.abs(min);
         }
         min = 0;
 
@@ -78,7 +78,7 @@ public class Schematic
         }
         for (int i = 2; i < objVertices.length; i+= 3)
         {
-            objVertices[i] += min;
+            objVertices[i] += Math.abs(min);
         }
 
         // width initialization
@@ -88,7 +88,7 @@ public class Schematic
             if (objVertices[i] > max)
                 max = objVertices[i];
         }
-        width = (short) Math.ceil(max);
+        width = (short) (Math.ceil(max) + 1);
         max = 0;
 
         // height initialization
@@ -97,7 +97,7 @@ public class Schematic
             if (objVertices[i] > max)
                 max = objVertices[i];
         }
-        height = (short) Math.ceil(max);
+        height = (short) (Math.ceil(max) + 1);
         max = 0;
 
         // length initialization
@@ -106,7 +106,7 @@ public class Schematic
             if (objVertices[i] > max)
                 max = objVertices[i];
         }
-        length = (short) Math.ceil(max);
+        length = (short) (Math.ceil(max) + 1);
 
         blocks = new byte[width * length * height];
         data = new byte[width * length * height];
@@ -216,11 +216,11 @@ public class Schematic
             0.5f,
             0.5f
         };
-        for (short x = (short) boundingBox[0][0]; x < (short) boundingBox[1][0]; ++x)
+        for (short x = (short) ((short) boundingBox[0][0]); x <= (short) boundingBox[1][0]; ++x)
         {
-            for (short y = (short) boundingBox[0][1]; y < (short) boundingBox[1][1]; ++y)
+            for (short y = (short) ((short) boundingBox[0][1]); y <= (short) boundingBox[1][1]; ++y)
             {
-                for (short z = (short) boundingBox[0][2]; z < (short) boundingBox[1][2]; ++z)
+                for (short z = (short) ((short) boundingBox[0][2]); z <= (short) boundingBox[1][2]; ++z)
                 {
                     float[] voxelCenter = new float[] {
                         x + 0.5f,
@@ -248,27 +248,8 @@ public class Schematic
             e.printStackTrace();
         }
         Obj triangulated = ObjUtils.triangulate(block);
-        int[] indices = null;
-        float[] vertices = null;
-        if (block != null) 
-        {
-            System.out.println(block.getNumFaces());
-            System.out.println(block.getNumVertices());
-            indices = ObjData.getFaceVertexIndicesArray(block);
-            vertices = ObjData.getVerticesArray(block);
-        }
-        int a = indices[0];
-        int b = indices[0];
-        int c = indices[0];
-        float x = vertices[a];
-        float y = vertices[b];
-        float z = vertices[c];
-        int stop = 0;
-        short width = 80;
-        short length = 90;
-        short height = 100;
         Schematic s = new Schematic(triangulated);
-        s.addBlock();
+        s.convertObj2Schematic();
         File test = new File("C:/Users/petrb/Documents/obj2mc/test.schematic");
         s.save(test);
     }
