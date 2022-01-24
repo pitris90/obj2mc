@@ -237,17 +237,17 @@ public class Schematic
     public static void main(String[] args) throws FileNotFoundException 
     {
         System.out.println("Hello World!");
-        Obj block = null;
+        Obj brno = null;
         // TODO: Path jako argument
-        try (InputStream blockFile = new FileInputStream("C:/Users/petrb/Documents/obj2mc/block.obj")) 
+        try (InputStream blockFile = new FileInputStream("C:/Users/petrb/Documents/obj2mc/brno_scaled.obj")) 
         {
-            block = ObjReader.read(blockFile);
+            brno = ObjReader.read(blockFile);
         } 
         catch (Exception e) 
         {
             e.printStackTrace();
         }
-        Obj triangulated = ObjUtils.triangulate(block);
+        Obj triangulated = ObjUtils.triangulate(brno);
         Schematic s = new Schematic(triangulated);
         s.convertObj2Schematic();
         File test = new File("C:/Users/petrb/Documents/obj2mc/test.schematic");
